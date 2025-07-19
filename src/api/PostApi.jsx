@@ -21,5 +21,5 @@ export const deletePost = (id) => {
 //post method (to update the data in api)
 
 export const postData = (post) => {
-    return api.post('/post', post);
+    return api.post('/posts', post);
 }

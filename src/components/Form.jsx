@@ -57,6 +57,8 @@ const Form = ({ data, setData}) => {
             id='body'
             name='body'
             placeholder='Add Post'
+             value={addData.body}
+            onChange={handleInputChange}
             />
         </div>
         <button type='submit'>Add</button>
