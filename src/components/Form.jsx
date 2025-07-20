@@ -1,12 +1,24 @@
-import React, { useState } from 'react'
-import { postData } from '../api/PostApi';
+import React, { useEffect, useState } from 'react'
+import { postData, updateData } from '../api/PostApi';
 
-const Form = ({ data, setData}) => {
+const Form = ({ data, setData, updateDataApi, setUpdateDataApi}) => {
 
     const [addData, setAddData] = useState({
         title: "",
         body: "",
     });
+
+    let isEmpty = Object.keys(updateDataApi).length === 0;
+
+    //get the updated data and add into input field
+    useEffect(() => {
+        updateDataApi && setAddData({
+           title: updateDataApi.title || "",
+           body: updateDataApi.body || "",
+        })
+
+    }, [updateDataApi])
+
 
     const handleInputChange = (e) => {
         const name = e.target.name;
@@ -28,11 +40,44 @@ const Form = ({ data, setData}) => {
             setAddData({title: "", body: ""});
         }
     }
+    //updatePostData
+    const updatePostData = async () => {
+        try {
+            const res = await updateData(updateDataApi.id, addData)
+            console.log(res)
+
+           if(res.status === 200){
+
+             setData((prev) => {
+                return prev.map((curElem) => {
+                    return curElem.id === res.data.id ? res.data : curElem;
+                })
+
+            })
+
+           setAddData({ title: "", body: ""});
+           setUpdateDataApi({});
+
+           }
+           
+        } catch ({error}) {
+            console.log(error);
+            
+        }
+        
+    }
+
     //form submission
 
     const handleFormSubmit = (e) => {
         e.preventDefault();
-        addPostData();
+        const action = e.nativeEvent.submitter.value;
+        if(action === "Add"){
+            addPostData();
+        }else if(action === "Edit"){
+            updatePostData();
+        }
+
     }
 
   return (
@@ -61,7 +106,9 @@ const Form = ({ data, setData}) => {
             onChange={handleInputChange}
             />
         </div>
-        <button type='submit'>Add</button>
+        <button type='submit' value={isEmpty ? "Add" : "Edit"}>
+            {isEmpty ? "Add" : "Edit"}
+            </button>
       
     </form>
   )
